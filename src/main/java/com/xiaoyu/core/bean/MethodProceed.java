@@ -1,0 +1,35 @@
+/**
+ * 唯有看书,不庸不扰
+ */
+package com.xiaoyu.core.bean;
+
+import java.lang.reflect.Method;
+
+/**
+ * @author:xiaoyu 2017年3月21日下午10:16:35
+ *
+ * @description:相当于spring里面的ProceedingsJoinPoint
+ */
+public class MethodProceed {
+
+	private Object[] args;
+
+	private Method method;
+
+	private Object target;
+
+	public MethodProceed(Object target, Method method, Object[] args) {
+		this.args = args;
+		this.method = method;
+		this.target = target;
+	}
+
+	public Object proceed() throws Exception {
+		return this.method.invoke(target, args);
+	}
+
+	public String methodName() {
+		return method.getName();
+	}
+
+}
