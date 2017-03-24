@@ -1,5 +1,5 @@
 # broccoli
-通过代理的方式实现注解方式的spring AOP方式,以及简单的IOC  
+通过动态代理实现注解方式的spring AOP,以及简单的IOC  
 1.支持Jdk原生代理和Cglib代理  
 2.支持多个代理的叠加效果  
 3.通过spi实现代理的扩展  
