@@ -16,7 +16,7 @@ import com.xiaoyu.core.bean.MethodProceed;
  * @description:���������
  */
 @Aspect
-public class AopAspect {
+public class AopAspect2 {
 
 	@PointCut("com.xiaoyu.example.*")
 	public void point() {
@@ -24,23 +24,23 @@ public class AopAspect {
 
 	@Before
 	public void before() {
-		System.out.println("前置before");
+		System.out.println("前置1before1");
 	}
 
 	@After
 	public void after() {
-		System.out.println("后置after");
+		System.out.println("后置1after1");
 	}
 
 	@Around
 	public void around(MethodProceed mp) {
-		System.out.println("环绕前置aroud before");
+		System.out.println("环绕前置1aroud before1");
 		try {
 			mp.proceed();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("环绕后置around after");
+		System.out.println("环绕前置2around after1");
 	}
 
 }

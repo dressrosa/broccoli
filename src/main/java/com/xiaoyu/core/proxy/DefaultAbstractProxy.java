@@ -1,5 +1,5 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.proxy;
 
@@ -10,9 +10,9 @@ import java.util.ServiceLoader;
 import com.xiaoyu.config.constant.AopType;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:28:16
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ10:28:16
  *
- * @description:Ä¬ÈÏµÄ´úÀíÊµÏÖ
+ * @description:é»˜è®¤çš„ä»£ç†å®ç°
  */
 public abstract class DefaultAbstractProxy {
 
@@ -27,4 +27,5 @@ public abstract class DefaultAbstractProxy {
 			proxy = new JdkProxy();
 		return proxy.getAopProxy(target, method, type);
 	}
+
 }

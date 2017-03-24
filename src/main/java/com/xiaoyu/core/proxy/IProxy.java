@@ -1,5 +1,5 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.proxy;
 
@@ -8,11 +8,12 @@ import java.lang.reflect.Method;
 import com.xiaoyu.config.constant.AopType;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:06:15
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ10:06:15
  *
- * @description:´úÀí½Ó¿Ú
+ * @description:ä»£ç†æ¥å£
  */
 public interface IProxy {
 
 	public Object getAopProxy(final Object target, final Method m, final AopType type);
+
 }

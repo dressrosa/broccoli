@@ -1,5 +1,5 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.proxy;
 
@@ -11,9 +11,9 @@ import com.xiaoyu.config.constant.AopType;
 import com.xiaoyu.core.bean.MethodProceed;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:07:01
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ10:07:01
  *
- * @description:jdkÔ­Éú´úÀí
+ * @description:jdkåŸç”Ÿä»£ç†
  */
 public class JdkProxy implements IProxy {
 
@@ -25,12 +25,13 @@ public class JdkProxy implements IProxy {
 						Object result = null;
 						switch (type) {
 						case BEFORE:
-							m.invoke(m.getDeclaringClass().newInstance(), m.getParameters());
+							// m.getParameters()æ˜¯jdk8çš„æ–¹æ³• jdk7æœ¨æœ‰
+							m.invoke(m.getDeclaringClass().newInstance(), new Object[] {});
 							result = method.invoke(target, args);
 							return result;
 						case AFTER:
 							result = method.invoke(target, args);
-							m.invoke(m.getDeclaringClass().newInstance(), m.getParameters());
+							m.invoke(m.getDeclaringClass().newInstance(), new Object[] {});
 							return result;
 						case AROUND:
 							MethodProceed mp = new MethodProceed(target, method, args);

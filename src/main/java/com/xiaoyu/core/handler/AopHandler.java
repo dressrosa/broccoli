@@ -1,5 +1,5 @@
 /**
- * Î¨ÓÐ¿´Êé,²»Ó¹²»ÈÅ
+ * Î¨ï¿½Ð¿ï¿½ï¿½ï¿½,ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½ï¿½
  */
 package com.xiaoyu.core.handler;
 
@@ -14,9 +14,9 @@ import com.xiaoyu.config.constant.AopType;
 import com.xiaoyu.core.proxy.DefaultAbstractProxy;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:34:17
+ * @author:xiaoyu 2017ï¿½ï¿½3ï¿½ï¿½21ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½10:34:17
  *
- * @description:aop×¢½â´¦ÀíÆ÷
+ * @description:aop×¢ï¿½â´¦ï¿½ï¿½ï¿½ï¿½
  */
 public class AopHandler implements AnnotationHandler {
 
@@ -49,6 +49,7 @@ public class AopHandler implements AnnotationHandler {
 				continue;
 			}
 		}
+
 		return proxy;
 	}
 
@@ -74,6 +75,7 @@ public class AopHandler implements AnnotationHandler {
 				}
 			}
 		}
+
 		return proxy;
 	}
 
