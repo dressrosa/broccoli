@@ -36,6 +36,8 @@ public class CglibProxy implements IProxy {
 		 * 也就是每次获取代理类的时候我们必须要setSuperclass,虽然我不知道怎么去吧动态生成的class
 		 * 给生成文件,然后看看,我猜应该是这样的. 因为java是单继承的模型,这样每次生成的代理类根本无法转化成我们想要的bean了.
 		 * 所以我们在前置和后置通知处理上,没有使用cglib代理,而是把她们放入SeesawQueue里面.直接返回原target
+		 * 而环绕通知我们每次传来的target都是上次的superClass,所以每次只会代理出一个正常的cglib类,
+		 * 这样就不会形成cglib多次编译形成的不伦不类的clglib$xxx. class了
 		 * 
 		 */
 		Class<?> cl = null;
@@ -51,22 +53,22 @@ public class CglibProxy implements IProxy {
 			return target;
 		case AFTER:
 			queue.pushLeft(m);
-			return target;
+			return target;// 这里根本没有代理,只是存入queue中
 		case AROUND:
 			hancer.setCallback(new MethodInterceptor() {
 				public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 					final SeesawQueue<Method> s = queue;
 					Method me = null;
-					while ((me = s.offerRight()) != null) {
+					while ((me = s.offerRight()) != null) {// 执行所有前置通知
 						try {
 							me.invoke(me.getDeclaringClass().newInstance(), new Object[] {});
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
-					// m.invoke(m.getDeclaringClass().newInstance(), new
-					// MethodProceed(target, method, args));
-					while ((me = s.offerLeft()) != null) {
+					// 执行所有环绕通知
+					m.invoke(m.getDeclaringClass().newInstance(), new MethodProceed(target, method, args));
+					while ((me = s.offerLeft()) != null) {// 执行所有后置通知
 						try {
 							me.invoke(me.getDeclaringClass().newInstance(), new Object[] {});
 						} catch (Exception e) {

@@ -21,7 +21,7 @@ public abstract class DefaultAbstractProxy {
 	public static Object getAopProxy(Object target, Method method, AopType type) {
 		ServiceLoader<IProxy> loader = ServiceLoader.load(IProxy.class);
 		Iterator<IProxy> iter = loader.iterator();
-		if (proxy == null && iter.hasNext())
+		while (proxy == null && iter.hasNext())// 加载默认的,以最后一个为准
 			proxy = iter.next();
 		if (proxy == null)
 			proxy = new JdkProxy();
