@@ -1,5 +1,5 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.test;
 
@@ -10,9 +10,9 @@ import com.xiaoyu.core.context.DefaultContext;
 import com.xiaoyu.example.People;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ22ÈÕÉÏÎç12:12:47
+ * @author:xiaoyu 2017å¹´3æœˆ22æ—¥ä¸Šåˆ12:12:47
  *
- * @description:²âÊÔ
+ * @description:æµ‹è¯•
  */
 public class Test {
 

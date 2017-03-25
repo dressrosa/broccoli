@@ -1,5 +1,5 @@
 /**
- * Ψ�п���,��ӹ����
+ * 唯有看书,不庸不扰
  */
 package com.xiaoyu.core.handler;
 
@@ -14,9 +14,9 @@ import com.xiaoyu.config.constant.AopType;
 import com.xiaoyu.core.proxy.DefaultAbstractProxy;
 
 /**
- * @author:xiaoyu 2017��3��21������10:34:17
+ * @author:xiaoyu
  *
- * @description:aopע�⴦����
+ * @description:aop处理器
  */
 public class AopHandler implements AnnotationHandler {
 

@@ -1,12 +1,12 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.handler;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:32:35
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ10:32:35
  *
- * @description:×¢½â´¦ÀíÆ÷
+ * @description:æ³¨è§£å¤„ç†å™¨
  */
 public interface AnnotationHandler {
 

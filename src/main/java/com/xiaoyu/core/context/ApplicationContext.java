@@ -1,14 +1,14 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.context;
 
 import java.io.IOException;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç11:05:12
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ11:05:12
  *
- * @description:ÉÏÏÂÎÄ ¼ÓÔØcomponent
+ * @description:ä¸Šä¸‹æ–‡ åŠ è½½component
  */
 public interface ApplicationContext {
 

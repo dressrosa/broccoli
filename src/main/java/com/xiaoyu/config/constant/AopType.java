@@ -1,12 +1,12 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.config.constant;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç9:38:48
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ9:38:48
  *
- * @description:Í¨ÖªÀàĞÍ Ç°ÖÃ/ºóÖÃ/»·ÈÆ
+ * @description:é€šçŸ¥ç±»å‹ å‰ç½®/åç½®/ç¯ç»•
  */
 public enum AopType {
 

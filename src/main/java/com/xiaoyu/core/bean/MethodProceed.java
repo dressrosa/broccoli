@@ -1,14 +1,14 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.bean;
 
 import java.lang.reflect.Method;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:16:35
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ10:16:35
  *
- * @description:Ïàµ±ÓÚspringÀïÃæµÄProceedingsJoinPoint
+ * @description:ç›¸å½“äºspringé‡Œé¢çš„ProceedingsJoinPoint
  */
 public class MethodProceed {
 

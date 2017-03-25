@@ -1,12 +1,12 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.example;
 
 import com.xiaoyu.config.annotation.bean.Component;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ22ÈÕÉÏÎç12:08:42
+ * @author:xiaoyu 2017å¹´3æœˆ22æ—¥ä¸Šåˆ12:08:42
  *
  * @description:
  */

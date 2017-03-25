@@ -1,5 +1,5 @@
 /**
- * Ψ�п���,��ӹ����
+ * 唯有看书,不庸不扰
  */
 package com.xiaoyu.example;
 
@@ -11,9 +11,9 @@ import com.xiaoyu.config.annotation.aop.PointCut;
 import com.xiaoyu.core.bean.MethodProceed;
 
 /**
- * @author:xiaoyu 2017��3��22������12:09:30
+ * @author:xiaoyu  
  *
- * @description:���������
+ * @description:切面
  */
 @Aspect
 public class AopAspect {

@@ -1,5 +1,5 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.core.utils;
 
@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
 import com.xiaoyu.config.annotation.aop.PointCut;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç10:28:16
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ10:28:16
  *
- * @description:aop¹¤¾ßÀà
+ * @description:aopå·¥å…·ç±»
  */
 public class AopUtils {
 
-	// »ñÈ¡ËùÓĞÏà¹ØµÄÇĞÃæÀà
+	// è·å–æ‰€æœ‰ç›¸å…³çš„åˆ‡é¢ç±»
 	public static List<Class<?>> getAspectClass(Map<String, Class<?>> aspectHolder, String name) {
 		Iterator<Class<?>> viter = aspectHolder.values().iterator();
 		List<Class<?>> cList = new ArrayList<Class<?>>();
@@ -44,7 +44,7 @@ public class AopUtils {
 			if (a instanceof PointCut) {
 				PointCut p = (PointCut) a;
 				Pattern r = Pattern.compile(p.value());
-				// ÊÇ·ñÂ·¾¶Æ¥ÅäÏàÍ¬
+				// æ˜¯å¦è·¯å¾„åŒ¹é…ç›¸åŒ
 				Matcher m = r.matcher(name);
 				for (;;) {
 					if (m.find())

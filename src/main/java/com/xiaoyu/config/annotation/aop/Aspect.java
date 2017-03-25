@@ -1,5 +1,5 @@
 /**
- * Î¨ÓĞ¿´Êé,²»Ó¹²»ÈÅ
+ * å”¯æœ‰çœ‹ä¹¦,ä¸åº¸ä¸æ‰°
  */
 package com.xiaoyu.config.annotation.aop;
 
@@ -10,9 +10,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author:xiaoyu 2017Äê3ÔÂ21ÈÕÏÂÎç9:42:02
+ * @author:xiaoyu 2017å¹´3æœˆ21æ—¥ä¸‹åˆ9:42:02
  *
- * @description:ÇĞÃæ
+ * @description:åˆ‡é¢
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
