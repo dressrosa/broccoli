@@ -1,7 +1,7 @@
 /**
  * 唯有看书,不庸不扰
  */
-package com.xiaoyu.core.proxy;
+package com.xiaoyu.aop.proxy;
 
 import java.lang.reflect.Method;
 

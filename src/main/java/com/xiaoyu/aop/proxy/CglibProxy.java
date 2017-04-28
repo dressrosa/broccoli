@@ -1,12 +1,14 @@
 /**
  * 唯有看书,不庸不扰
  */
-package com.xiaoyu.core.proxy;
+package com.xiaoyu.aop.proxy;
 
 import java.lang.reflect.Method;
+
+import com.xiaoyu.aop.bean.MethodProceed;
 import com.xiaoyu.common.utils.SeesawQueue;
 import com.xiaoyu.config.constant.AopType;
-import com.xiaoyu.core.bean.MethodProceed;
+
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;

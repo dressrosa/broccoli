@@ -1,7 +1,7 @@
 /**
  * 唯有看书,不庸不扰
  */
-package com.xiaoyu.core.bean;
+package com.xiaoyu.aop.bean;
 
 import java.lang.reflect.Method;
 

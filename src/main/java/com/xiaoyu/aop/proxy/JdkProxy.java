@@ -1,14 +1,14 @@
 /**
  * 唯有看书,不庸不扰
  */
-package com.xiaoyu.core.proxy;
+package com.xiaoyu.aop.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import com.xiaoyu.aop.bean.MethodProceed;
 import com.xiaoyu.config.constant.AopType;
-import com.xiaoyu.core.bean.MethodProceed;
 
 /**
  * @author:xiaoyu 2017年3月21日下午10:07:01

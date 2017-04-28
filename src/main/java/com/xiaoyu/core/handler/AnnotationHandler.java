@@ -8,7 +8,7 @@ package com.xiaoyu.core.handler;
  *
  * @description:注解处理器
  */
-public interface AnnotationHandler {
+public interface AnnotationHandler extends Handler{
 
 	public Object handle(final Class<?> annoClass, final Object target);
 

@@ -3,12 +3,12 @@
  */
 package com.xiaoyu.example;
 
+import com.xiaoyu.aop.bean.MethodProceed;
 import com.xiaoyu.config.annotation.aop.After;
 import com.xiaoyu.config.annotation.aop.Around;
 import com.xiaoyu.config.annotation.aop.Aspect;
 import com.xiaoyu.config.annotation.aop.Before;
 import com.xiaoyu.config.annotation.aop.PointCut;
-import com.xiaoyu.core.bean.MethodProceed;
 
 /**
  * @author:xiaoyu
