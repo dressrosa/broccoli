@@ -12,10 +12,11 @@ import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-
 import com.xiaoyu.aop.handler.AopHandler;
 import com.xiaoyu.config.annotation.aop.Aspect;
 import com.xiaoyu.config.annotation.bean.Component;
+import com.xiaoyu.config.annotation.bean.Controller;
+import com.xiaoyu.config.annotation.bean.Service;
 import com.xiaoyu.core.handler.AnnotationHandler;
 import com.xiaoyu.core.utils.AopUtils;
 
@@ -31,9 +32,9 @@ public class DefaultContext implements ApplicationContext {
 	private String packageName;
 
 	// 存储所有标有component的class
-	private static HashMap<String, Class<?>> beanHolder = new HashMap<String, Class<?>>();
+	protected static HashMap<String, Class<?>> beanHolder = new HashMap<String, Class<?>>();
 	// 存储所有标有aspect的class
-	private static HashMap<String, Class<?>> aspectHolder = new HashMap<String, Class<?>>();
+	protected static HashMap<String, Class<?>> aspectHolder = new HashMap<String, Class<?>>();
 
 	public Object getBean(String name) {
 		if (!STARTED)
@@ -112,7 +113,7 @@ public class DefaultContext implements ApplicationContext {
 						if ((c.isInterface() && c.isAnnotation()) || !c.isInterface() && !c.isEnum()) {
 							annos = c.getAnnotations();
 							for (Annotation an : annos) {
-								if (an instanceof Component) {
+								if (an instanceof Component || an instanceof Controller || an instanceof Service) {
 									beanHolder.put(packageName + "." + className, c);
 									continue;
 								}

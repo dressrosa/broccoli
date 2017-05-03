@@ -1,7 +1,7 @@
 /**
- * 唯有看读书,不庸不扰
+ * 唯有读书,不庸不扰
  */
-package com.xiaoyu.config.annotation.bean;
+package com.xiaoyu.config.annotation.request;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,13 +10,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author:xiaoyu 2017年3月21日下午10:05:04
- *
- * @description:注解bean才会被扫描到
+ * 2017年5月3日下午2:16:16
+ * 
+ * @author xiaoyu
+ * @description
+ * @version 1.0
  */
-@Target(ElementType.TYPE)
+@Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Component {
+public @interface RequestMapping {
 
+	String value() default "/";
 }

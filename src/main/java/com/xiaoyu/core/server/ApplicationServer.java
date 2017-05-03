@@ -5,6 +5,9 @@ package com.xiaoyu.core.server;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xiaoyu.core.context.ApplicationContext;
 import com.xiaoyu.core.context.DefaultContext;
 import com.xiaoyu.core.http.NettyServer;
@@ -16,6 +19,8 @@ import com.xiaoyu.core.http.NettyServer;
  * @description 启动项
  */
 public class ApplicationServer {
+
+	private static final Logger logger = LoggerFactory.getLogger("ApplicationServer");
 
 	private ApplicationContext context;
 
@@ -34,7 +39,24 @@ public class ApplicationServer {
 		return this;
 	}
 
-	public ApplicationServer run(int port) {
+	private void initContext() {
+		if (this.context == null)
+			context = new DefaultContext();
+
+	}
+
+	public ApplicationServer rootPackage(String packageName) {
+		initContext();
+		this.context.setRootPackage(packageName);
+		try {
+			context.init();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return this;
+	}
+
+	public void run(int port) {
 		this.port = port;
 		final ApplicationContext context = this.context;
 		try {
@@ -43,24 +65,20 @@ public class ApplicationServer {
 			e1.printStackTrace();
 		}
 		try {
-			nettyServer = new NettyServer();
+			nettyServer = new NettyServer(context);
 			nettyServer.run(this.port);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return this;
 	}
 
-	public static void run() {
-		final ApplicationContext context = new DefaultContext();
-		final NettyServer nettyServer = new NettyServer();
+	public void run() {
+		initContext();
+		final NettyServer nettyServer = new NettyServer(context);
 		try {
-			context.init();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			nettyServer.run(DEFAULT_PORT);
+			this.port = DEFAULT_PORT;
+			logger.info("server start in port " + port);
+			nettyServer.run(port);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

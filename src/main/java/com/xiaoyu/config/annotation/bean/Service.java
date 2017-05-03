@@ -1,5 +1,5 @@
 /**
- * 唯有看读书,不庸不扰
+ * 唯有读书,不庸不扰
  */
 package com.xiaoyu.config.annotation.bean;
 
@@ -10,13 +10,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author:xiaoyu 2017年3月21日下午10:05:04
- *
- * @description:注解bean才会被扫描到
+ * 2017年5月3日下午2:15:47
+ * 
+ * @author xiaoyu
+ * @description
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Component {
+public @interface Service {
 
 }

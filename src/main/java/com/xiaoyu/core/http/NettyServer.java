@@ -3,6 +3,9 @@
  */
 package com.xiaoyu.core.http;
 
+import com.xiaoyu.core.context.ApplicationContext;
+import com.xiaoyu.core.context.DispatchStation;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -14,46 +17,53 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
-/**2017年4月27日下午2:36:30
+/**
+ * 2017年4月27日下午2:36:30
+ * 
  * @author xiaoyu
  * @description netty实现的http server
  */
 public class NettyServer {
 
 	public static void main(String args[]) throws InterruptedException {
-		NettyServer s = new NettyServer();
-		s.run(8080);
+		// NettyServer s = new NettyServer();
+		// s.run(8080);
 	}
+
+	private DispatchStation dispatcher;
+
+	public NettyServer(ApplicationContext context) {
+		this.dispatcher = new DispatchStation(context);
+	}
+
 	public void run(int port) throws InterruptedException {
 		NioEventLoopGroup boss = new NioEventLoopGroup();
 		NioEventLoopGroup worker = new NioEventLoopGroup();
-		
+
 		ServerBootstrap boot = new ServerBootstrap();
 		try {
-			boot.group(boss, worker)
-			.channel(NioServerSocketChannel.class)
-			.option(ChannelOption.SO_BACKLOG,128)
-			.childOption(ChannelOption.TCP_NODELAY, true)
-			.childHandler(new ChannelInitializer<SocketChannel>() {
-				@Override
-				protected void initChannel(SocketChannel ch) throws Exception {
-					ChannelPipeline p = ch.pipeline();
-					p
-					//.addLast(new HttpRequestDecoder())
-					//.addLast(new HttpResponseEncoder())
-					.addLast(new HttpServerCodec())
-					.addLast(new HttpObjectAggregator(1024*1024*1))
-					.addLast(new HttpContentCompressor())//gzip
-					.addLast(new NettyServerHandler());
-				}
-				 
-			});
-			
+			boot.group(boss, worker).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 128)
+					.childOption(ChannelOption.TCP_NODELAY, true).handler(new LoggingHandler(LogLevel.ERROR))
+					.childHandler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						protected void initChannel(SocketChannel ch) throws Exception {
+							ChannelPipeline p = ch.pipeline();
+							p
+									// .addLast(new HttpRequestDecoder())
+									// .addLast(new HttpResponseEncoder())
+									.addLast(new HttpServerCodec()).addLast(new HttpObjectAggregator(1024 * 1024 * 1))
+									.addLast(new HttpContentCompressor())// gzip
+									.addLast(new NettyServerHandler(dispatcher));
+						}
+
+					});
+
 			ChannelFuture f = boot.bind(port).sync();
 			f.channel().closeFuture().sync();
-		}
-		finally {
+		} finally {
 			boss.shutdownGracefully();
 			worker.shutdownGracefully();
 		}
