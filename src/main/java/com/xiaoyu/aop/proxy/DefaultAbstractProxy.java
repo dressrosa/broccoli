@@ -23,8 +23,9 @@ public abstract class DefaultAbstractProxy {
 		Iterator<IProxy> iter = loader.iterator();
 		while (proxy == null && iter.hasNext())// 加载默认的,以最后一个为准
 			proxy = iter.next();
-		if (proxy == null)
-			proxy = new JdkProxy();
+
+		if (!target.getClass().isInterface() || proxy == null)// 非接口情况下不能使用jdk
+			proxy = new CglibProxy();
 		return proxy.getAopProxy(target, method, type);
 	}
 

@@ -3,10 +3,12 @@
  */
 package com.xiaoyu.core.context;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +31,9 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
 /**
  * 2017年4月28日下午4:25:00
@@ -40,6 +45,9 @@ public class DispatchStation {
 
 	private static final Logger logger = LoggerFactory.getLogger("DispatchStation");
 
+	// public static void main(String args[ ]){
+	// System.out.println(DispatchStation.class.getName());
+	// }
 	private ApplicationContext context;
 
 	public DispatchStation(ApplicationContext context) {
@@ -54,13 +62,15 @@ public class DispatchStation {
 	// 存放所有的requestmapping对应的<url,methodName>
 	private static HashMap<String, String> mappingHolder = new HashMap<String, String>();
 
+	private static final String SPLIT_CHAR = ":";
+
 	/**
 	 * 初始化所有的访问映射地址
 	 * 
 	 * @throws BrocolliException
 	 */
 	public void initUrlMappings() throws BrocolliException {
-		final Collection<Class<?>> valueSet = DefaultContext.beanHolder.values();
+		final Collection<Class<?>> valueSet = DefaultContext.clsHolder.values();
 		final Iterator<Class<?>> iter = valueSet.iterator();
 		while (iter.hasNext()) {
 			Class<?> cls = iter.next();
@@ -73,8 +83,10 @@ public class DispatchStation {
 						headUrl = "/" + headUrl;
 				}
 				Method[] methods = cls.getDeclaredMethods();
-				if (methods.length == 0) // controller里面啥都没有
+				if (methods.length == 0) { // controller里面啥都没有
+					mappingHolder.put(headUrl, null);// 路径存在,但是什么都木有
 					continue;
+				}
 
 				RequestMapping rm = null;
 				for (Method m : methods) {
@@ -100,7 +112,7 @@ public class DispatchStation {
 						throw new BrocolliException("the mapping [" + url + "] in the " + cls.getSimpleName() + "."
 								+ m.getName() + " exists the same one.");
 					}
-					mappingHolder.put(url, m.getName());
+					mappingHolder.put(url, cls.getName() + SPLIT_CHAR + m.getName());
 				}
 
 			}
@@ -124,6 +136,10 @@ public class DispatchStation {
 			return response;
 		}
 		result = dispatch0(uri);
+		if (result == null) {
+			response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+			return response;
+		}
 		content = Unpooled.wrappedBuffer(result.getBytes());
 		response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
 		return response;
@@ -134,7 +150,7 @@ public class DispatchStation {
 			return mappingHolder.containsKey(uri);
 		if (uri.contains("?"))
 			return mappingHolder.containsKey(uri.split("\\?")[0]);
-		return false;
+		return mappingHolder.containsKey(uri);
 	}
 
 	private String dispatch0(String uri) {
@@ -142,7 +158,7 @@ public class DispatchStation {
 		Callable<String> task = new Callable<String>() {
 			@Override
 			public String call() throws Exception {
-				return processMethod(uri1);
+				return (String) processMethod(uri1);
 			}
 		};
 		Future<String> f = executor.submit(task);
@@ -160,14 +176,78 @@ public class DispatchStation {
 		return result;
 	}
 
-	private String processMethod(String uri) {
+	private Object processMethod(String uri) {
+		// for example /home/bibi?name=123&pwd=234
 		if (!uri.contains("?")) {
-			String methodName = mappingHolder.get(uri);
-
+			String location = mappingHolder.get(uri);
+			if (location == null)
+				return null;
+			String[] str = location.split(SPLIT_CHAR);
+			String clsName = str[0];
+			String methodName = str[1];
+			Method[] methods = DefaultContext.clsHolder.get(clsName).getDeclaredMethods();
+			for (Method m : methods) {
+				if (m.getName().equals(methodName)) {
+					try {
+						return m.invoke(context.getBean(clsName), null);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		} else {
 			String[] arr = uri.split("\\?");
-
+			String params = arr[1];
+			Map<String, String> paramsMap = new HashMap<String, String>();
+			String[] paramKv = params.split("&");
+			Object[] paramsArr = new Object[paramKv.length];
+			for (int i = 0; i < paramKv.length; i++) {
+				String[] parr = paramKv[i].split("=");
+				paramsMap.put(parr[0], parr[1]);
+				paramsArr[i] = parr[1];
+			}
+			String location = mappingHolder.get(arr[0]);
+			if (location == null)
+				return null;
+			String[] str = location.split(SPLIT_CHAR);
+			String clsName = str[0];
+			String methodName = str[1];
+//			Enhancer hancer = new Enhancer();
+//			hancer.setSuperclass(context.getBean(clsName).getClass());
+//			hancer.setCallback(new MethodInterceptor() {
+//				@Override
+//				public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+//					// System.out.println("健身房");
+//					// for (Object o : args) {
+//					// System.out.println(o);
+//					// }
+//					// return proxy.invokeSuper(obj, args);
+//					return null;
+//				}
+//			});
+			Method[] methods = context.getBean(clsName).getClass().getDeclaredMethods();
+			// Method[] methods =
+			// DefaultContext.clsHolder.get(clsName).getDeclaredMethods();
+			//无法判断参数
+			for (Method m : methods) {
+				try {
+					// m.invoke(o, paramsArr);
+					if (m.getName().equals(methodName)) {
+						return m.invoke(context.getBean(clsName), paramsArr);
+					}
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		return "TODO";
+		return null;
 	}
 }

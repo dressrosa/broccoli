@@ -32,7 +32,9 @@ public class DefaultContext implements ApplicationContext {
 	private String packageName;
 
 	// 存储所有标有component的class
-	protected static HashMap<String, Class<?>> beanHolder = new HashMap<String, Class<?>>();
+	protected static HashMap<String, Class<?>> clsHolder = new HashMap<String, Class<?>>();
+	//存储所有标有component的class的一个实例
+	protected static HashMap<String, Object> singletonHolder = new HashMap<String, Object>();
 	// 存储所有标有aspect的class
 	protected static HashMap<String, Class<?>> aspectHolder = new HashMap<String, Class<?>>();
 
@@ -40,17 +42,21 @@ public class DefaultContext implements ApplicationContext {
 		if (!STARTED)
 			throw new IllegalStateException("context not init,please init first");
 		try {
-			Class<?> c = beanHolder.get(name);
+			Class<?> c = clsHolder.get(name);
 			if (c == null)
 				throw new ClassNotFoundException(("cannot find class " + name + ",please check annotation"));
 			AnnotationHandler annoHandler = new AopHandler();
 			List<Class<?>> aspectList = AopUtils.getAspectClass(aspectHolder, name);
-			Object o = annoHandler.handle(aspectList.toArray(new Class[aspectList.size()]), c.newInstance());
+			Object o = annoHandler.handle(aspectList.toArray(new Class[aspectList.size()]),singletonHolder.get(name));
 			return o;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public Class<?> getHandledClass(String name) {
+		return getBean(name).getClass();
 	}
 
 	public ApplicationContext setRootPackage(String packgeName) {
@@ -114,7 +120,16 @@ public class DefaultContext implements ApplicationContext {
 							annos = c.getAnnotations();
 							for (Annotation an : annos) {
 								if (an instanceof Component || an instanceof Controller || an instanceof Service) {
-									beanHolder.put(packageName + "." + className, c);
+									clsHolder.put(packageName + "." + className, c);
+									try {
+										singletonHolder.put(packageName + "." + className, c.newInstance());
+									} catch (InstantiationException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (IllegalAccessException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 									continue;
 								}
 								if (an instanceof Aspect) {

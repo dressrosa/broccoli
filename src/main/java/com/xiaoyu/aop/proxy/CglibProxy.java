@@ -22,15 +22,20 @@ import net.sf.cglib.proxy.MethodProxy;
 public class CglibProxy implements IProxy {
 
 	/**
-	 * 右边存储前置通知,左边存储后置通知,这个可以自己决定
+	 * 右边存储前置通知,左边存储后置通知,这个可以自己决定,用threadlocal存储每次请求的代理
 	 */
-	SeesawQueue<Method> queue = new SeesawQueue<Method>();
+	private static ThreadLocal<SeesawQueue<Method>> local = new ThreadLocal<SeesawQueue<Method>>() {
+		@Override
+		protected SeesawQueue<Method> initialValue() {
+			return new SeesawQueue<Method>();
+		}
 
+	};
 	public static int count = 0;
 	Enhancer hancer = new Enhancer();
 
 	/*
-	 * 实现代理叠加
+	 * 实现代理叠加 m代表切面类里面的方法
 	 */
 	public Object getAopProxy(final Object target, final Method m, final AopType type) {
 		/*
@@ -51,15 +56,15 @@ public class CglibProxy implements IProxy {
 		hancer.setSuperclass(cl);
 		switch (type) {
 		case BEFORE:
-			queue.pushRight(m);
+			local.get().pushRight(m);
 			return target;
 		case AFTER:
-			queue.pushLeft(m);
+			local.get().pushLeft(m);
 			return target;// 这里根本没有代理,只是存入queue中
 		case AROUND:
 			hancer.setCallback(new MethodInterceptor() {
 				public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-					final SeesawQueue<Method> s = queue;
+					final SeesawQueue<Method> s = local.get();
 					Method me = null;
 					while ((me = s.offerRight()) != null) {// 执行所有前置通知
 						try {

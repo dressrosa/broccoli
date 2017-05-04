@@ -76,7 +76,6 @@ public class AopHandler implements AnnotationHandler {
 				}
 			}
 		}
-
 		return proxy;
 	}
 

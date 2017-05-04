@@ -11,7 +11,7 @@ import com.xiaoyu.config.annotation.request.RequestMapping;
 public class TestController {
 
 	@RequestMapping("bibi")
-	public void hello(String s){
-		
+	public String hello(String name,String pwd){
+		return "nihaoa "+name+":"+pwd;
 	}
 }

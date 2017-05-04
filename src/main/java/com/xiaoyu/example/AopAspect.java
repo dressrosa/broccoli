@@ -33,14 +33,16 @@ public class AopAspect {
 	}
 
 	@Around
-	public void around(MethodProceed mp) {
+	public Object around(MethodProceed mp) {
 		System.out.println("环绕前置aroud before");
+		Object o = null;
 		try {
-			mp.proceed();
+			o = mp.proceed();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("环绕后置around after");
+		return o;
 	}
 
 }

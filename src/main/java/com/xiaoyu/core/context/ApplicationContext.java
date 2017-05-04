@@ -14,6 +14,8 @@ public interface ApplicationContext {
 
 	public Object getBean(String name);
 
+	public Class<?> getHandledClass(String name);
+
 	public ApplicationContext setRootPackage(String packgeName);
 
 	public ApplicationContext init() throws IOException;
