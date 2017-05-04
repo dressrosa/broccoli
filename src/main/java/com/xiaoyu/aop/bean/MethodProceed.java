@@ -18,13 +18,14 @@ public class MethodProceed {
 
 	private Object target;
 
-	public MethodProceed(Object target, Method method, Object[] args) {
+	public MethodProceed( Object target, Method method, Object[] args) {
 		this.args = args;
 		this.method = method;
 		this.target = target;
 	}
 
 	public Object proceed() throws Exception {
+		this.method.setAccessible(true);
 		return this.method.invoke(target, args);
 	}
 

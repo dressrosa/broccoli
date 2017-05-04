@@ -5,6 +5,7 @@ package com.xiaoyu.core.context;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -176,7 +177,7 @@ public class DispatchStation {
 		return result;
 	}
 
-	private Object processMethod(String uri) {
+	private Object processMethod(String uri) throws BrocolliException {
 		// for example /home/bibi?name=123&pwd=234
 		if (!uri.contains("?")) {
 			String location = mappingHolder.get(uri);
@@ -204,11 +205,11 @@ public class DispatchStation {
 			String params = arr[1];
 			Map<String, String> paramsMap = new HashMap<String, String>();
 			String[] paramKv = params.split("&");
-			Object[] paramsArr = new Object[paramKv.length];
+			// Object[] paramsArr = new Object[paramKv.length];
 			for (int i = 0; i < paramKv.length; i++) {
 				String[] parr = paramKv[i].split("=");
 				paramsMap.put(parr[0], parr[1]);
-				paramsArr[i] = parr[1];
+				// paramsArr[i] = parr[1];
 			}
 			String location = mappingHolder.get(arr[0]);
 			if (location == null)
@@ -216,28 +217,46 @@ public class DispatchStation {
 			String[] str = location.split(SPLIT_CHAR);
 			String clsName = str[0];
 			String methodName = str[1];
-//			Enhancer hancer = new Enhancer();
-//			hancer.setSuperclass(context.getBean(clsName).getClass());
-//			hancer.setCallback(new MethodInterceptor() {
-//				@Override
-//				public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-//					// System.out.println("健身房");
-//					// for (Object o : args) {
-//					// System.out.println(o);
-//					// }
-//					// return proxy.invokeSuper(obj, args);
-//					return null;
-//				}
-//			});
+			// Enhancer hancer = new Enhancer();
+			// hancer.setSuperclass(context.getBean(clsName).getClass());
+			// hancer.setCallback(new MethodInterceptor() {
+			// @Override
+			// public Object intercept(Object obj, Method method, Object[] args,
+			// MethodProxy proxy) throws Throwable {
+			// // System.out.println("健身房");
+			// // for (Object o : args) {
+			// // System.out.println(o);
+			// // }
+			// // return proxy.invokeSuper(obj, args);
+			// return null;
+			// }
+			// });
 			Method[] methods = context.getBean(clsName).getClass().getDeclaredMethods();
 			// Method[] methods =
 			// DefaultContext.clsHolder.get(clsName).getDeclaredMethods();
-			//无法判断参数
+			// 判断参数
 			for (Method m : methods) {
 				try {
-					// m.invoke(o, paramsArr);
+					// 此处依赖于java8
+					Parameter[] para = m.getParameters();
+					Object[] pArr = new Object[para.length];
+					for (int i = 0; i < para.length; i++) {
+						if (para[i].isNamePresent()) {
+							if (paramsMap.containsKey(para[i])) {
+								pArr[i] = paramsMap.get(para[i]);
+								continue;
+							}
+						} else {
+							// 此处只能严格依赖参数的传入顺序了
+							if (i == para.length - 1)
+								pArr = paramsMap.values().toArray();
+							break;
+						}
+						// 正常是肯定有参数的
+						throw new BrocolliException("the param " + para[i].getName() + " missed.");
+					}
 					if (m.getName().equals(methodName)) {
-						return m.invoke(context.getBean(clsName), paramsArr);
+						return m.invoke(context.getBean(clsName), pArr);
 					}
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();

@@ -12,6 +12,7 @@ public class TestController {
 
 	@RequestMapping("bibi")
 	public String hello(String name,String pwd){
+		System.out.println("nihoa");
 		return "nihaoa "+name+":"+pwd;
 	}
 }

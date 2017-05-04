@@ -20,13 +20,13 @@ import com.xiaoyu.example.TestController;
 public class Test {
 
 	public static void main(String[] args) throws IOException {
-		 ApplicationContext context = new DefaultContext();
-		 context.setRootPackage("com.xiaoyu").init();
-		 People p = (People) context.getBean("com.xiaoyu.example.Man");
-		 p.sayHello("xiaoyu");
+//		 ApplicationContext context = new DefaultContext();
+//		 context.setRootPackage("com.xiaoyu").init();
+//		 People p = (People) context.getBean("com.xiaoyu.example.Man");
+//		 p.sayHello("xiaoyu");
 		
-//		ApplicationServer server = new ApplicationServer();
-//		server.rootPackage("com.xiaoyu").run(); 
+		ApplicationServer server = new ApplicationServer();
+		server.rootPackage("com.xiaoyu").run(); 
 		//System.out.println(TestController.class.getDeclaredMethods()[0].getName());
 		 
 	}

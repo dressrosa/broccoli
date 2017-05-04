@@ -41,7 +41,7 @@ public class AopAspect2 {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("环绕前置2around after1");
+		System.out.println("环绕后置1around after1");
 		return o;
 	}
 

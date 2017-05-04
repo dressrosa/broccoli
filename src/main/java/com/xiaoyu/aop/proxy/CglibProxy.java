@@ -37,7 +37,7 @@ public class CglibProxy implements IProxy {
 	/*
 	 * 实现代理叠加 m代表切面类里面的方法
 	 */
-	public Object getAopProxy(final Object target, final Method m, final AopType type) {
+	public Object getAopProxy( Object target, final Method m, final AopType type) {
 		/*
 		 * 通过双眼怒视好久发现,cglib不能实现代理叠加的原因在于她是以继承为基础的原理.
 		 * 也就是每次获取代理类的时候我们必须要setSuperclass,虽然我不知道怎么去吧动态生成的class
@@ -74,7 +74,7 @@ public class CglibProxy implements IProxy {
 						}
 					}
 					// 执行所有环绕通知
-					m.invoke(m.getDeclaringClass().newInstance(), new MethodProceed(target, method, args));
+					Object result = m.invoke(m.getDeclaringClass().newInstance(), new MethodProceed(target, method, args));
 					while ((me = s.offerLeft()) != null) {// 执行所有后置通知
 						try {
 							me.invoke(me.getDeclaringClass().newInstance(), new Object[] {});
@@ -82,7 +82,7 @@ public class CglibProxy implements IProxy {
 							e.printStackTrace();
 						}
 					}
-					return null;
+					return result;
 				}
 			});
 			return hancer.create();
