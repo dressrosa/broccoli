@@ -25,7 +25,7 @@ public class MethodProceed {
 	}
 
 	public Object proceed() throws Exception {
-		this.method.setAccessible(true);
+		//this.method.setAccessible(true);
 		return this.method.invoke(target, args);
 	}
 

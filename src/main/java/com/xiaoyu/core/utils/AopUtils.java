@@ -1,5 +1,5 @@
 /**
- * 唯有看书,不庸不扰
+ * 唯有读书,不庸不扰
  */
 package com.xiaoyu.core.utils;
 
@@ -50,7 +50,6 @@ public class AopUtils {
 					if (m.find())
 						return true;
 				}
-
 			}
 		}
 		return false;

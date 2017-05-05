@@ -104,10 +104,6 @@ public class SeesawQueue<V> {
 		count.decrementAndGet();
 	}
 
-	public int count() {
-		return count.get();
-	}
-
 	/**
 	 * 从右边先出队,右边出完再从左边出对
 	 * 
@@ -140,6 +136,10 @@ public class SeesawQueue<V> {
 
 	public boolean hasElements() {
 		return count.get() == 0 ? false : true;
+	}
+
+	public int size() {
+		return count.get();
 	}
 
 	/**

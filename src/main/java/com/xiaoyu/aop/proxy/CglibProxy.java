@@ -37,7 +37,7 @@ public class CglibProxy implements IProxy {
 	/*
 	 * 实现代理叠加 m代表切面类里面的方法
 	 */
-	public Object getAopProxy( Object target, final Method m, final AopType type) {
+	public Object getAopProxy(final Object target, final Method m, final AopType type) {
 		/*
 		 * 通过双眼怒视好久发现,cglib不能实现代理叠加的原因在于她是以继承为基础的原理.
 		 * 也就是每次获取代理类的时候我们必须要setSuperclass,虽然我不知道怎么去吧动态生成的class
@@ -66,21 +66,22 @@ public class CglibProxy implements IProxy {
 				public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 					final SeesawQueue<Method> s = local.get();
 					Method me = null;
-					while ((me = s.offerRight()) != null) {// 执行所有前置通知
-						try {
+					try {
+						while ((me = s.offerRight()) != null) {// 执行所有前置通知
 							me.invoke(me.getDeclaringClass().newInstance(), new Object[] {});
-						} catch (Exception e) {
-							e.printStackTrace();
 						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 					// 执行所有环绕通知
-					Object result = m.invoke(m.getDeclaringClass().newInstance(), new MethodProceed(target, method, args));
-					while ((me = s.offerLeft()) != null) {// 执行所有后置通知
-						try {
+					Object result = m.invoke(m.getDeclaringClass().newInstance(),
+							new MethodProceed(target, method, args));
+					try {
+						while ((me = s.offerLeft()) != null) {// 执行所有后置通知
 							me.invoke(me.getDeclaringClass().newInstance(), new Object[] {});
-						} catch (Exception e) {
-							e.printStackTrace();
 						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 					return result;
 				}

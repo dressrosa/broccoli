@@ -35,7 +35,7 @@ public class AopHandler implements AnnotationHandler {
 		if (aspectAnno == null)
 			throw new IllegalArgumentException("cannot find annotation \"aspect\"");
 		Object proxy = target;
-		final Method[] methods = annoClass.getMethods();
+		final Method[] methods = annoClass.getDeclaredMethods();
 		for (Method m : methods) {
 			if (m.getAnnotation(Before.class) != null) {
 				proxy = DefaultAbstractProxy.getAopProxy(target, m, AopType.BEFORE);
@@ -60,7 +60,7 @@ public class AopHandler implements AnnotationHandler {
 		Object proxy = target;
 		Method[] methods;
 		for (Class<?> cl : annoClass) {
-			methods = cl.getMethods();
+			methods = cl.getDeclaredMethods();
 			for (Method m : methods) {
 				if (m.getAnnotation(Before.class) != null) {
 					proxy = DefaultAbstractProxy.getAopProxy(proxy, m, AopType.BEFORE);
