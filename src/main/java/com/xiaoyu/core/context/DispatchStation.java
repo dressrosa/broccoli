@@ -3,12 +3,14 @@
  */
 package com.xiaoyu.core.context;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,8 +33,12 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.multipart.Attribute;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 
 /**
  * 2017年4月28日下午4:25:00
@@ -126,6 +132,7 @@ public class DispatchStation {
 	 */
 	public FullHttpResponse dispatch(FullHttpRequest request) {
 		final String uri = request.uri();
+		logger.info("访问地址:" + uri);
 		FullHttpResponse response = null;
 		String result = null;
 		ByteBuf content = null;
@@ -134,7 +141,25 @@ public class DispatchStation {
 			response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, content);
 			return response;
 		}
-		result = dispatch0(uri);
+
+		if (HttpMethod.GET.equals(request.method())) {
+			result = dispatch0(uri, null);
+		} else if (HttpMethod.POST.equals(request.method())) {
+			HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
+			decoder.offer(request);
+			List<InterfaceHttpData> parmList = decoder.getBodyHttpDatas();
+			Map<String, Object> map = new HashMap<>();
+			for (InterfaceHttpData p : parmList) {
+				Attribute data = (Attribute) p;
+				try {
+					map.put(data.getName(), data.getValue());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			result = dispatch0(uri, map);
+		}
+
 		if (result == null) {
 			response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 			return response;
@@ -152,12 +177,13 @@ public class DispatchStation {
 		return mappingHolder.containsKey(uri);
 	}
 
-	private String dispatch0(String uri) {
+	private String dispatch0(String uri, Map<String, Object> paramsMap) {
 		final String uri1 = uri;
 		Callable<String> task = new Callable<String>() {
 			@Override
 			public String call() throws Exception {
-				return (String) processMethod(uri1);
+				return (String) processMethod(uri1, paramsMap);
+
 			}
 		};
 		Future<String> f = executor.submit(task);
@@ -173,7 +199,7 @@ public class DispatchStation {
 		return result;
 	}
 
-	private Object processMethod(String uri) throws BrocolliException {
+	private Object processMethod(String uri, Map<String, Object> paramsMap) throws BrocolliException {
 		// for example /home/bibi?name=123&pwd=234
 		if (!uri.contains("?")) {
 			String location = mappingHolder.get(uri);
@@ -186,7 +212,10 @@ public class DispatchStation {
 			for (Method m : methods) {
 				if (m.getName().equals(methodName)) {
 					try {
-						return m.invoke(context.getBean(clsName), new Object[] {});
+						if (paramsMap == null)// get方法
+							return m.invoke(context.getBean(clsName), new Object[] {});
+						// post方法
+						return m.invoke(context.getBean(clsName), paramsMap.values().toArray());
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
@@ -199,13 +228,12 @@ public class DispatchStation {
 		} else {
 			String[] arr = uri.split("\\?");
 			String params = arr[1];
-			Map<String, String> paramsMap = new HashMap<String, String>();
+			paramsMap = new HashMap<String, Object>();
 			String[] paramKv = params.split("&");
-			// Object[] paramsArr = new Object[paramKv.length];
 			for (int i = 0; i < paramKv.length; i++) {
 				String[] parr = paramKv[i].split("=");
 				paramsMap.put(parr[0], parr[1]);
-				// paramsArr[i] = parr[1];
+
 			}
 			String location = mappingHolder.get(arr[0]);
 			if (location == null)
