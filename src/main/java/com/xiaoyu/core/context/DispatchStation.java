@@ -4,6 +4,7 @@
 package com.xiaoyu.core.context;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xiaoyu.config.annotation.bean.Autowired;
 import com.xiaoyu.config.annotation.bean.Controller;
 import com.xiaoyu.config.annotation.request.RequestMapping;
 import com.xiaoyu.core.exception.BrocolliException;
@@ -50,9 +52,6 @@ public class DispatchStation {
 
 	private static final Logger logger = LoggerFactory.getLogger("DispatchStation");
 
-	// public static void main(String args[ ]){
-	// System.out.println(DispatchStation.class.getName());
-	// }
 	private ApplicationContext context;
 
 	public DispatchStation(ApplicationContext context) {
@@ -82,6 +81,7 @@ public class DispatchStation {
 			String url = null;
 			String headUrl = null;// 标注在类上面的requestMapping
 			if (cls.isAnnotationPresent(Controller.class)) {// 是否标有controller
+				initFields(cls);
 				if (cls.isAnnotationPresent(RequestMapping.class)) {// 是否标有requestMapping
 					headUrl = cls.getAnnotation(RequestMapping.class).value();
 					if (!headUrl.startsWith("/") && !headUrl.equals("/"))
@@ -124,6 +124,33 @@ public class DispatchStation {
 		}
 	}
 
+	/**
+	 * 对类里面的注入类进行递归初始化(注入类的实现类里面可能也有注入类),
+	 */
+	private void initFields(Class cls) {
+		for (Field f : cls.getDeclaredFields()) {
+			try {
+				// 有自动注入的,进行注入
+				if (f.isAnnotationPresent(Autowired.class)) {
+					if (!f.isAccessible())
+						f.setAccessible(true);
+					Class target = DefaultContext.clsHolder.get(DefaultContext.implHolder.get(f.getType().getName()));
+					if (target != null) {
+						initFields(target);
+					}
+					f.set(DefaultContext.singletonHolder.get(cls.getName()),
+							DefaultContext.singletonHolder.get(target.getName()));
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 用于开启进程执行一次请求
+	 */
 	private ExecutorService executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
 			new LinkedTransferQueue<Runnable>());
 

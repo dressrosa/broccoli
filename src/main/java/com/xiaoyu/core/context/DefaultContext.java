@@ -33,10 +33,12 @@ public class DefaultContext implements ApplicationContext {
 
 	// 存储所有标有component的class
 	protected static HashMap<String, Class<?>> clsHolder = new HashMap<String, Class<?>>();
-	//存储所有标有component的class的一个实例
+	// 存储所有标有component的class的一个实例
 	protected static HashMap<String, Object> singletonHolder = new HashMap<String, Object>();
 	// 存储所有标有aspect的class
 	protected static HashMap<String, Class<?>> aspectHolder = new HashMap<String, Class<?>>();
+	// 存储class对应的实现类名(全包名)
+	protected static HashMap<String, String> implHolder = new HashMap<String, String>();
 
 	public Object getBean(String name) {
 		if (!STARTED)
@@ -47,14 +49,14 @@ public class DefaultContext implements ApplicationContext {
 				throw new ClassNotFoundException(("cannot find class " + name + ",please check annotation"));
 			AnnotationHandler annoHandler = new AopHandler();
 			List<Class<?>> aspectList = AopUtils.getAspectClass(aspectHolder, name);
-			Object o = annoHandler.handle(aspectList.toArray(new Class[aspectList.size()]),singletonHolder.get(name));
+			Object o = annoHandler.handle(aspectList.toArray(new Class[aspectList.size()]), singletonHolder.get(name));
 			return o;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public Class<?> getHandledClass(String name) {
 		return getBean(name).getClass();
 	}
@@ -121,14 +123,9 @@ public class DefaultContext implements ApplicationContext {
 							for (Annotation an : annos) {
 								if (an instanceof Component || an instanceof Controller || an instanceof Service) {
 									clsHolder.put(packageName + "." + className, c);
-									try {
-										singletonHolder.put(packageName + "." + className, c.newInstance());
-									} catch (InstantiationException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									} catch (IllegalAccessException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
+									singletonHolder.put(packageName + "." + className, c.newInstance());
+									if (c.getInterfaces().length > 0) {
+										implHolder.put(c.getInterfaces()[0].getName(), packageName + "." + className);
 									}
 									continue;
 								}
@@ -138,10 +135,11 @@ public class DefaultContext implements ApplicationContext {
 								}
 							}
 						}
+
 					}
 				}
 			}
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
 	}
