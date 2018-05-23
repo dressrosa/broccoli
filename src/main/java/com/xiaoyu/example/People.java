@@ -5,10 +5,9 @@ package com.xiaoyu.example;
 
 /**
  * @author:xiaoyu 2017年3月22日上午12:07:59
- *
  * @description:
  */
 public interface People {
 
-	public void sayHello(String name);
+    public void sayHello(String name);
 }

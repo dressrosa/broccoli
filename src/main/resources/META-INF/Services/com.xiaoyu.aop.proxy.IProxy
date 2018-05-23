@@ -1,2 +1,2 @@
-com.xiaoyu.aop.proxy.CglibProxy
-#com.xiaoyu.aop.proxy.JdkProxy
+com.xiaoyu.aop.proxy.JdkProxy
+#com.xiaoyu.aop.proxy.CglibProxy

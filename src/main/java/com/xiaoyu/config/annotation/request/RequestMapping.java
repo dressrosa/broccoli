@@ -1,5 +1,5 @@
 /**
- * 唯有读书,不庸不扰
+ * 唯有读书,不慵不扰
  */
 package com.xiaoyu.config.annotation.request;
 
@@ -21,5 +21,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface RequestMapping {
 
-	String value() default "/";
+    String value() default "/";
 }

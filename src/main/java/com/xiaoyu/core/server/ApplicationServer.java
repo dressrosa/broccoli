@@ -20,69 +20,70 @@ import com.xiaoyu.core.http.NettyServer;
  */
 public class ApplicationServer {
 
-	private static final Logger logger = LoggerFactory.getLogger("ApplicationServer");
+    private static final Logger logger = LoggerFactory.getLogger("ApplicationServer");
 
-	private ApplicationContext context;
+    private ApplicationContext context;
 
-	private NettyServer nettyServer;
+    private NettyServer nettyServer;
 
-	private static final int DEFAULT_PORT = 8080;
+    private static final int DEFAULT_PORT = 8080;
 
-	private int port;
+    private int port;
 
-	public void applicationContext(ApplicationContext context) {
-		this.context = context;
-	}
+    public void applicationContext(ApplicationContext context) {
+        this.context = context;
+    }
 
-	public ApplicationServer port(int port) {
-		this.port = port;
-		return this;
-	}
+    public ApplicationServer port(int port) {
+        this.port = port;
+        return this;
+    }
 
-	private void initContext() {
-		if (this.context == null)
-			context = new DefaultContext();
+    private void initContext() {
+        if (context == null) {
+            context = new DefaultContext();
+        }
 
-	}
+    }
 
-	public ApplicationServer rootPackage(String packageName) {
-		initContext();
-		this.context.setRootPackage(packageName);
-		try {
-			context.init();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return this;
-	}
+    public ApplicationServer rootPackage(String packageName) {
+        this.initContext();
+        context.setRootPackage(packageName);
+        try {
+            context.init();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
 
-	public void run(int port) {
-		this.port = port;
-		final ApplicationContext context = this.context;
-		try {
-			context.init();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		try {
-			nettyServer = new NettyServer(context);
-			nettyServer.run(this.port);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+    public void run(int port) {
+        this.port = port;
+        final ApplicationContext context = this.context;
+        try {
+            context.init();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            nettyServer = new NettyServer(context);
+            nettyServer.run(this.port);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void run() {
-		initContext();
-		final NettyServer nettyServer = new NettyServer(context);
-		try {
-			this.port = DEFAULT_PORT;
-			logger.info("server start in port " + port);
-			nettyServer.run(port);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+    public void run() {
+        this.initContext();
+        final NettyServer nettyServer = new NettyServer(context);
+        try {
+            port = DEFAULT_PORT;
+            logger.info("server start in port " + port);
+            nettyServer.run(port);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
 }

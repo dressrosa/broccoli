@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
 
 /**
  * @author:xiaoyu 2017年3月21日下午9:42:34
- *
  * @description:切点
  */
 @Target(ElementType.METHOD)
@@ -19,5 +18,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface PointCut {
 
-	public String value() default "";
+    public String value() default "";
 }

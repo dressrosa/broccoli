@@ -11,22 +11,23 @@ import com.xiaoyu.config.constant.AopType;
 
 /**
  * @author:xiaoyu 2017年3月21日下午10:28:16
- *
  * @description:默认的代理实现
  */
 public abstract class DefaultAbstractProxy {
 
-	private static IProxy proxy;
+    private static IProxy proxy;
 
-	public static Object getAopProxy(Object target, Method method, AopType type) {
-		ServiceLoader<IProxy> loader = ServiceLoader.load(IProxy.class);
-		Iterator<IProxy> iter = loader.iterator();
-		while (proxy == null && iter.hasNext())// 加载默认的,以最后一个为准
-			proxy = iter.next();
+    public static Object getAopProxy(Object target, Method method, AopType type) {
+        ServiceLoader<IProxy> loader = ServiceLoader.load(IProxy.class);
+        Iterator<IProxy> iter = loader.iterator();
+        while (proxy == null && iter.hasNext()) {
+            proxy = iter.next();
+        }
 
-		if (!target.getClass().isInterface() || proxy == null)// 非接口情况下不能使用jdk
-			proxy = new CglibProxy();
-		return proxy.getAopProxy(target, method, type);
-	}
+        if (!target.getClass().isInterface() || proxy == null) {
+            proxy = new CglibProxy();
+        }
+        return proxy.getAopProxy(target, method, type);
+    }
 
 }

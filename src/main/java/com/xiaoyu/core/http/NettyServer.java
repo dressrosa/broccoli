@@ -28,44 +28,44 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public class NettyServer {
 
-	public static void main(String args[]) throws InterruptedException {
-		// NettyServer s = new NettyServer();
-		// s.run(8080);
-	}
+    public static void main(String args[]) throws InterruptedException {
+        // NettyServer s = new NettyServer();
+        // s.run(8080);
+    }
 
-	private DispatchStation dispatcher;
+    private final DispatchStation dispatcher;
 
-	public NettyServer(ApplicationContext context) {
-		this.dispatcher = new DispatchStation(context);
-	}
+    public NettyServer(ApplicationContext context) {
+        dispatcher = new DispatchStation(context);
+    }
 
-	public void run(int port) throws InterruptedException {
-		NioEventLoopGroup boss = new NioEventLoopGroup();
-		NioEventLoopGroup worker = new NioEventLoopGroup();
+    public void run(int port) throws InterruptedException {
+        NioEventLoopGroup boss = new NioEventLoopGroup();
+        NioEventLoopGroup worker = new NioEventLoopGroup();
 
-		ServerBootstrap boot = new ServerBootstrap();
-		try {
-			boot.group(boss, worker).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 128)
-					.childOption(ChannelOption.TCP_NODELAY, true).handler(new LoggingHandler(LogLevel.ERROR))
-					.childHandler(new ChannelInitializer<SocketChannel>() {
-						@Override
-						protected void initChannel(SocketChannel ch) throws Exception {
-							ChannelPipeline p = ch.pipeline();
-							p
-									// .addLast(new HttpRequestDecoder())
-									// .addLast(new HttpResponseEncoder())
-									.addLast(new HttpServerCodec()).addLast(new HttpObjectAggregator(1024 * 1024 * 1))
-									.addLast(new HttpContentCompressor())// gzip
-									.addLast(new NettyServerHandler(dispatcher));
-						}
+        ServerBootstrap boot = new ServerBootstrap();
+        try {
+            boot.group(boss, worker).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.TCP_NODELAY, true).handler(new LoggingHandler(LogLevel.ERROR))
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline p = ch.pipeline();
+                            p
+                                    // .addLast(new HttpRequestDecoder())
+                                    // .addLast(new HttpResponseEncoder())
+                                    .addLast(new HttpServerCodec()).addLast(new HttpObjectAggregator(1024 * 1024 * 1))
+                                    .addLast(new HttpContentCompressor())// gzip
+                                    .addLast(new NettyServerHandler(dispatcher));
+                        }
 
-					});
+                    });
 
-			ChannelFuture f = boot.bind(port).sync();
-			f.channel().closeFuture().sync();
-		} finally {
-			boss.shutdownGracefully();
-			worker.shutdownGracefully();
-		}
-	}
+            ChannelFuture f = boot.bind(port).sync();
+            f.channel().closeFuture().sync();
+        } finally {
+            boss.shutdownGracefully();
+            worker.shutdownGracefully();
+        }
+    }
 }

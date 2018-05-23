@@ -5,5 +5,5 @@ package com.xiaoyu.example;
 
 public interface ITestService {
 
-	public String hello(String name); 
+    public String hello(String name);
 }

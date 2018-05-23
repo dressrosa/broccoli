@@ -5,5 +5,5 @@ package com.xiaoyu.example;
 
 public interface IPeopleService {
 
-	public String getFullName(String name);
+    public String getFullName(String name);
 }
