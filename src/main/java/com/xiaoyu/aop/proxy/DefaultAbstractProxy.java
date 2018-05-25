@@ -18,6 +18,9 @@ public abstract class DefaultAbstractProxy {
     private static IProxy proxy;
 
     public static Object getAopProxy(Object target, Method method, AopType type) {
+        if (proxy != null) {
+            return proxy.getAopProxy(target, method, type);
+        }
         ServiceLoader<IProxy> loader = ServiceLoader.load(IProxy.class);
         Iterator<IProxy> iter = loader.iterator();
         while (proxy == null && iter.hasNext()) {

@@ -9,16 +9,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
- * 2017年5月3日下午2:15:47
- * 
- * @author xiaoyu
+ * @author hongyu
+ * @date 2018-05
  * @description
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Controller {
+@Controller
+public @interface RestController {
 
 }
 

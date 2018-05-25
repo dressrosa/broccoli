@@ -3,11 +3,12 @@
  */
 package com.xiaoyu.core.server;
 
-import java.io.IOException;
+import java.io.File;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xiaoyu.common.utils.ResourceUtil;
 import com.xiaoyu.core.context.ApplicationContext;
 import com.xiaoyu.core.context.DefaultContext;
 import com.xiaoyu.core.http.NettyServer;
@@ -24,11 +25,12 @@ public class ApplicationServer {
 
     private ApplicationContext context;
 
-    private NettyServer nettyServer;
-
     private static final int DEFAULT_PORT = 8080;
+    private static final String DEFAULT_ROOT = File.separator;
 
-    private int port;
+    private int port = -1;
+
+    private String rootPackage = null;
 
     public void applicationContext(ApplicationContext context) {
         this.context = context;
@@ -43,47 +45,44 @@ public class ApplicationServer {
         if (context == null) {
             context = new DefaultContext();
         }
-
     }
 
     public ApplicationServer rootPackage(String packageName) {
-        this.initContext();
-        context.setRootPackage(packageName);
-        try {
-            context.init();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.rootPackage = packageName;
         return this;
-    }
-
-    public void run(int port) {
-        this.port = port;
-        final ApplicationContext context = this.context;
-        try {
-            context.init();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        try {
-            nettyServer = new NettyServer(context);
-            nettyServer.run(this.port);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public void run() {
         this.initContext();
-        final NettyServer nettyServer = new NettyServer(context);
+        if (this.rootPackage == null) {
+            this.rootPackage = ResourceUtil.rootPackage();
+        }
+        if (this.rootPackage == null) {
+            this.rootPackage = DEFAULT_ROOT;
+        }
+        context.setRootPackage(rootPackage);
         try {
-            port = DEFAULT_PORT;
-            logger.info("server start in port " + port);
-            nettyServer.run(port);
-        } catch (InterruptedException e) {
+            context.init();
+            final NettyServer nettyServer = new NettyServer(context);
+            if (port > 0) {
+                logger.info("server start in port " + port);
+                nettyServer.run(port);
+                return;
+            }
+            String tport = ResourceUtil.port();
+            if (tport != null) {
+                port = Integer.valueOf(tport);
+            } else {
+                port = DEFAULT_PORT;
+            }
+            if (port > 0) {
+                logger.info("server start in port " + port);
+                nettyServer.run(port);
+            } else {
+                throw new Exception("port must be a positive integer");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }

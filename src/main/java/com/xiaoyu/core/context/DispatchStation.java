@@ -43,6 +43,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.MixedFileUpload;
 import io.netty.util.internal.StringUtil;
 
 /**
@@ -96,6 +97,7 @@ public class DispatchStation {
             String headUrl = null;
             // 是否标有controller
             if (cls.isAnnotationPresent(Controller.class)) {
+                // 初始化成员变量
                 this.initFields(cls);
                 // 是否标有requestMapping
                 if (cls.isAnnotationPresent(RequestMapping.class)) {
@@ -152,8 +154,10 @@ public class DispatchStation {
      * 对类里面的注入类进行递归初始化(注入类的实现类里面可能也有注入类),
      */
     private void initFields(Class<?> cls) {
-        for (Field f : cls.getDeclaredFields()) {
-            try {
+        String fieldName = null;
+        try {
+            for (Field f : cls.getDeclaredFields()) {
+                fieldName = f.getName();
                 // 有自动注入的,进行注入
                 if (f.isAnnotationPresent(Autowired.class)) {
                     if (!f.isAccessible()) {
@@ -167,9 +171,9 @@ public class DispatchStation {
                                 DefaultContext.singletonHolder.get(target.getName()));
                     }
                 }
-            } catch (Exception e) {
-                logger.error("cannot autowired the filed->{}", f.getName(), e);
             }
+        } catch (Exception e) {
+            logger.error("cannot autowired the filed->{}", fieldName, e);
         }
     }
 
@@ -195,10 +199,19 @@ public class DispatchStation {
             decoder.offer(request);
             List<InterfaceHttpData> parmList = decoder.getBodyHttpDatas();
             Map<String, Object> map = new HashMap<>();
+            // httpRequest
+            map.put("request", request);
             try {
                 for (InterfaceHttpData p : parmList) {
-                    Attribute data = (Attribute) p;
-                    map.put(data.getName(), data.getValue());
+                    if (p instanceof Attribute) {
+                        Attribute data = (Attribute) p;
+                        map.put(data.getName(), data.getValue());
+                    } else if (p instanceof MixedFileUpload) {
+                        // 处理多媒体文件
+                        MixedFileUpload data = (MixedFileUpload) p;
+                        map.put(data.getName(), data);
+                    }
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -278,7 +291,6 @@ public class DispatchStation {
         } else {
             String[] arr = uri.split("\\?");
             String params = arr[1];
-            paramsMap = new HashMap<>();
             String[] paramKv = params.split("&");
             for (int i = 0; i < paramKv.length; i++) {
                 String[] parr = paramKv[i].split("=");
@@ -322,7 +334,7 @@ public class DispatchStation {
                     } else {
                         // 此处只能严格依赖参数的传入顺序了
                         logger.warn(
-                                "cannot match params correctly,recommend to add @RequestParam with name int method->{}",
+                                "cannot match params correctly,recommend to add @RequestParam with name in method->{}",
                                 m.getName());
                         pArr = paramsMap.values().toArray();
                     }
@@ -373,22 +385,34 @@ public class DispatchStation {
         Object[] pArr = new Object[argsNames.length];
         Object pValue = null;
         for (int i = 0; i < argsNames.length; i++) {
-            if (paramsMap.containsKey(argsNames[i])) {
-                pValue = paramsMap.get(argsNames[i]);
-                if (pValue == null) {
-                    // 检查是否有@requestParam
-                    pValue = doCheckRequestParam(para[i], argsNames[i], paramsMap);
+            // 检查是否有@requestParam
+            pValue = doCheckRequestParam(para[i], argsNames[i], paramsMap);
+            if (pValue == null) {
+                if (paramsMap.containsKey(argsNames[i])) {
+                    pValue = paramsMap.get(argsNames[i]);
+                } else {
+                    pValue = doCheckSpecialParam(para[i], paramsMap);
                 }
-            } else {
-                // 检查是否有@requestParam
-                pValue = doCheckRequestParam(para[i], argsNames[i], paramsMap);
             }
             if (pValue != null) {
                 pArr[i] = pValue;
             }
         }
-
         return pArr;
+    }
+
+    /**
+     * 是否是特殊参数 比如httprequest
+     * 
+     * @param parameter
+     * @return
+     */
+    private Object doCheckSpecialParam(Parameter parameter, Map<String, Object> paramsMap) {
+        System.out.println(parameter.getType().getSimpleName());
+        if ("FullHttpRequest".equals(parameter.getType().getSimpleName())) {
+            return paramsMap.get("request");
+        }
+        return null;
     }
 
     /**
@@ -407,18 +431,11 @@ public class DispatchStation {
         if (rp != null) {
             if (!StringUtil.isNullOrEmpty(rp.name())) {
                 Object pValue1 = paramsMap.get(rp.name());
-                if (pValue1 == null) {
-                    if (rp.required()) {
-                        throw new BrocolliException(
-                                "the param " + paName + " required.");
-                    }
-                }
-                return pValue1;
-            } else {
-                if (rp.required()) {
+                if (rp.required() && pValue1 == null) {
                     throw new BrocolliException(
                             "the param " + paName + " required.");
                 }
+                return pValue1;
             }
         }
         return null;

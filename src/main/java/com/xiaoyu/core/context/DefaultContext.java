@@ -84,7 +84,10 @@ public class DefaultContext implements ApplicationContext {
         if (packageName == null || "".equals(packageName)) {
             throw new IllegalArgumentException("packageName cannot be null");
         }
-        String packageDir = packageName.replace(".", "/");
+        String packageDir = packageName.replace(".", File.separator);
+        if (packageDir.equals(File.separator)) {
+            packageDir = "";
+        }
         Enumeration<URL> dirs = Thread.currentThread().getContextClassLoader().getResources(packageDir);
         while (dirs.hasMoreElements()) {
             URL url = dirs.nextElement();
@@ -127,7 +130,7 @@ public class DefaultContext implements ApplicationContext {
                                 .loadClass(packageName + "." + className);
                         Annotation[] annos;
                         // 注解类其实也是个interface
-                        if ((c.isInterface() && c.isAnnotation()) || !c.isInterface() && !c.isEnum()) {
+                        if (!(c.isInterface() && c.isAnnotation()) || !c.isInterface() && !c.isEnum()) {
                             annos = c.getAnnotations();
                             for (Annotation an : annos) {
                                 if (an instanceof Component || an instanceof Controller || an instanceof Service) {
@@ -138,7 +141,7 @@ public class DefaultContext implements ApplicationContext {
                                     }
                                     continue;
                                 }
-                                //切面类
+                                // 切面类
                                 if (an instanceof Aspect) {
                                     aspectHolder.put(packageName + "." + className, c);
                                     continue;

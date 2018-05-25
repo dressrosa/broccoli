@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
  * 获取方法的参数名
  * 
  * @author hongyu
- * @date 2018-05-23 18:16
- * @description 取之于spring->LocalVariableTableParameterNameDiscoverer
+ * @date 2018-05
+ * @description 取之于spring源码->LocalVariableTableParameterNameDiscoverer.java
  */
 public class MethodParamsResolver {
 

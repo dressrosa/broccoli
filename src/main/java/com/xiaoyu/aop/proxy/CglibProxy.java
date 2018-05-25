@@ -45,7 +45,7 @@ public class CglibProxy implements IProxy {
          * 给生成文件,然后看看,不过我猜应该是这样的. 因为java是单继承的模型,这样每次生成的代理类根本无法转化成我们想要的bean了.
          * 所以我们在前置和后置通知处理上,没有使用cglib代理,而是把她们放入SeesawQueue里面.直接返回原target
          * 而环绕通知我们每次传来的target都是上次的superClass,所以每次只会代理出一个正常的cglib类,
-         * 这样就不会形成cglib多次编译形成的不伦不类的clglib$xxx. class了
+         * 这样就不会形成cglib多次编译形成的不伦不类的clglib$xxx.class了
          */
         Class<?> cl = null;
         if ("java.lang.Object".equals(target.getClass().getSuperclass().getName())) {
@@ -59,8 +59,9 @@ public class CglibProxy implements IProxy {
             local.get().pushRight(m);
             return target;
         case AFTER:
+            // 这里根本没有代理,只是存入queue中
             local.get().pushLeft(m);
-            return target;// 这里根本没有代理,只是存入queue中
+            return target;
         case AROUND:
             hancer.setCallback(new MethodInterceptor() {
                 @Override

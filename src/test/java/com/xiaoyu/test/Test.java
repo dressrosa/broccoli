@@ -4,6 +4,8 @@
 package com.xiaoyu.test;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import com.xiaoyu.core.server.ApplicationServer;
 
@@ -21,8 +23,9 @@ public class Test {
         // p.sayHello("xiaoyu");
         // http
         ApplicationServer server = new ApplicationServer();
-        server.rootPackage("com.xiaoyu").run();
-            
+        server
+                .rootPackage("com.xiaoyu")
+                .run();
     }
 
 }
